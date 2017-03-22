@@ -22,8 +22,13 @@ package org.apache.james.transport.matchers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collection;
+
+import org.apache.mailet.MailAddress;
+import org.apache.mailet.base.test.FakeMail;
 import org.apache.mailet.base.test.FakeMailContext;
 import org.apache.mailet.base.test.FakeMatcherConfig;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,11 +41,12 @@ public class SMTPAuthSuccessfulTest {
         testee = new SMTPAuthSuccessful();
         testee.init(FakeMatcherConfig.builder()
             .mailetContext(FakeMailContext.defaultContext())
+            .matcherName("name")
             .build());
     }
 
     @Test
-    public void matchShouldReturnRecipientsWhenAuthUserAttributeIsPresent() {
+    public void matchShouldReturnRecipientsWhenAuthUserAttributeIsPresent() throws Exception{
         /*
         Question 1
 
@@ -50,10 +56,23 @@ public class SMTPAuthSuccessfulTest {
 
         As a result, the recipient should be returned
          */
+    	
+    	FakeMail fakeEmail = FakeMail.builder()
+    			.recipient(new MailAddress("vanthanh@gmail.com"))
+    		.attribute("org.apache.james.SMTPAuthUser", "true")
+    		.build();
+    	
+    	
+    	Collection<MailAddress> result = testee.match(fakeEmail);
+    	
+    	assertThat(result).contains(new MailAddress("vanthanh@gmail.com"));
+    	
+    	
+    	
     }
 
     @Test
-    public void matchShouldNotReturnRecipientsWhenAuthUserAttributeIsAbsent() {
+    public void matchShouldNotReturnRecipientsWhenAuthUserAttributeIsAbsent() throws Exception {
         /*
         Question 2
 
@@ -63,6 +82,13 @@ public class SMTPAuthSuccessfulTest {
 
         As a result, the recipient should not be returned
          */
+    	FakeMail fakeEmail = FakeMail.builder()
+    			.recipient(new MailAddress("vanthanh@gmail.com"))
+    			.build();
+    	Collection<MailAddress> result = testee.match(fakeEmail);
+       	
+       	assertThat(result).isNull();
+    	
     }
 
 }

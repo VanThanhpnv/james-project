@@ -45,5 +45,9 @@ public class RecipientToLowerCase extends GenericMailet{
         }
         mail.setRecipients(newRcpts);
     }
+	
+    
+    
+
 
 }
